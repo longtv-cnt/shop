@@ -1,0 +1,168 @@
+﻿import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: MyHomePage(),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  final TextEditingController _controller = TextEditingController();
+  String _inputText = '';
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Custom Keyboard'),
+      ),
+      body: SingleChildScrollView(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _controller.clear(); // Clear previous input
+                      _inputText = ''; // Clear previous input
+                    });
+                  },
+                  child: Text('Clear Input'),
+                ),
+                SizedBox(height: 20),
+                TextFormField(
+                  controller: _controller,
+                  keyboardType: TextInputType.text,
+                  decoration: InputDecoration(
+                    hintText: 'Enter text or number',
+                  ),
+                  onChanged: (text) {
+                    setState(() {
+                      _inputText = text; // Update the input text
+                    });
+                  },
+                ),
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => NumericPage(
+                          initialInput: _inputText,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Text('Go to Numeric Input'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class NumericPage extends StatefulWidget {
+  final String initialInput;
+
+  NumericPage({required this.initialInput});
+
+  @override
+  _NumericPageState createState() => _NumericPageState();
+}
+
+class _NumericPageState extends State<NumericPage> {
+  final TextEditingController _controller = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.text = widget.initialInput; // Set initial input
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Numeric Input'),
+      ),
+      body: SingleChildScrollView(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context); // Go back to previous page
+                  },
+                  child: Text('Back to Text Input'),
+                ),
+                SizedBox(height: 20),
+                TextFormField(
+                  controller: _controller,
+                  keyboardType: TextInputType.text,
+                  decoration: InputDecoration(
+                    hintText: 'Enter text or number',
+                  ),
+                  onChanged: (text) {
+                    setState(() {
+                      // Update the input text
+                      _controller.text = text;
+                    });
+                  },
+                ),
+                SizedBox(height: 20),
+                GridView.count(
+                  shrinkWrap: true,
+                  crossAxisCount: 3,
+                  children: List.generate(10, (index) {
+                    return InkWell(
+                      onTap: () {
+                        setState(() {
+                          // Append the selected number to the input text
+                          _controller.text += index.toString();
+                        });
+                      },
+                      child: Center(
+                        child: Text(
+                          index.toString(),
+                          style: TextStyle(fontSize: 24),
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+}

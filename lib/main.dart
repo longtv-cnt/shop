@@ -1,131 +1,209 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:shop/admin.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: LoginScreen(),
       debugShowCheckedModeBanner: false,
+      title: 'Calculator',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.deepPurple),
+        useMaterial3: true,
+      ),
+      home: const Calculator(),
     );
   }
 }
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class Calculator extends StatefulWidget {
+  const Calculator({Key? key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<Calculator> createState() => _CalculatorState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
-  final _textEditingController  = TextEditingController();
-String _correctPassword = "12345";
+class _CalculatorState extends State<Calculator> {
+  String userInput = '';
+  String _correctPassword = '12345';
+  String errorMessage = '';
+
+  List<String> buttons = [
+    '7',
+    '8',
+    '9',
+    '4',
+    '5',
+    '6',
+    '1',
+    '2',
+    '3',
+    '0',
+    'ESC',
+    'enter',
+    'GE',
+    'VI'
+  ];
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Login"),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: const Color.fromARGB(255, 253, 249, 249),
+        body: Column(
           children: [
-            TextField(
-              controller: _textEditingController,
-              obscureText: true,
-              decoration:  const InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: "Password",
-                hintText: "Enter your password",
+            SizedBox(
+              child: Column(
+                children: [
+                  const Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      // IconButton(
+                      //   onPressed: () {},
+                      //   icon: Icon(Icons.access_alarms),
+                      // ),
+                      Icon(Icons.key, size: 30),
+                      Text(
+                        'Password',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(width: 100),
+                      // IconButton(
+                      //   onPressed: () {},
+                      //   icon: Icon(Icons.more_vert),
+                      // ),
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 2.0),
+                    child: TextField(
+                      decoration: InputDecoration(
+                        border: const OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.red, width: 2.0)),
+                        labelText: 'Enter your password',
+                        errorText:
+                            errorMessage.isNotEmpty ? errorMessage : null,
+                      ),
+                      obscureText: true,
+                      readOnly: true,
+                      keyboardType: TextInputType.none,
+                      controller: TextEditingController(text: userInput),
+                    ),
+                  ),
+                ],
               ),
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              autofocus: true, // Focus vào TextField khi màn hình được hiển thị
-              onSubmitted: (_) {
-                handleSubmitted(_textEditingController.text,_correctPassword);
-              },
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 1),
+                child: GridView.builder(
+                  shrinkWrap: false,
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 2.0, // Adjust this value
+                    mainAxisSpacing: 2.0, // Adjust this value
+                  ),
+                  itemCount: buttons.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return CustomButton(
+                      text: buttons[index],
+                    );
+                  },
+                ),
+              ),
             ),
           ],
         ),
       ),
     );
   }
-  void handleSubmitted(String text,_correctPassword) {
-    if (text == _correctPassword) {Navigator.push(
-      context, MaterialPageRoute(
-        builder: (context) => AdminScreen()));}
-    else {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: const Text("Login"),
-            content: const Text("Login failed"),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text("OK"),
-              ),
-            ],
-          );
+
+  Widget CustomButton({required String text}) {
+    return Padding(
+      padding: const EdgeInsets.all(0),
+      child: InkWell(
+        splashColor: Colors.lightGreen,
+        onTap: () {
+          setState(() {
+            handle(text);
+          });
         },
-      );    
-      
-   
+        child: Ink(
+          // width: 0.1,
+          // height: 0.1,
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(255, 245, 243, 243),
+            borderRadius: BorderRadius.circular(1),
+          ),
+          child: Center(
+            child: text == 'GE'
+                ? Image.asset(
+                    'assets/image/ge_flag.jpg',
+                    width: 24,
+                    height: 24,
+                  )
+                : text == 'VI'
+                    ? Image.asset(
+                        'assets/image/vi_flag.png', //
+                        width: 24,
+                        height: 24,
+                      )
+                    : Text(
+                        text,
+                        style: TextStyle(fontSize: 27, color: getColor(text)),
+                      ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  getColor(String text) {
+    if (text == 'enter') {
+      return Colors.red;
     }
-    // if (text == _correctPassword) {
-    //   showDialog(
-    //     context: context,
-    //     builder: (context) {
-    //       return AlertDialog(
-    //         title: const Text("Login"),
-    //         content: const Text("Login success"),
-    //         actions: [
-    //           TextButton(
-    //             onPressed: () {
-    //               Navigator.of(context).pop();
-    //             },
-    //             child: const Text("OK"),
-    //           ),
-    //         ],
-    //       );
-    //     },
-    //   );
-    // } else {
-    //   showDialog(
-    //     context: context,
-    //     builder: (context) {
-    //       return AlertDialog(
-    //         title: const Text("Login"),
-    //         content: const Text("Login failed"),
-    //         actions: [
-    //           TextButton(
-    //             onPressed: () {
-    //               Navigator.of(context).pop();
-    //             },
-    //             child: const Text("OK"),
-    //           ),
-    //         ],
-    //       );
-    //     },
-    //   );
-    // }
-
+    return const Color.fromARGB(255, 2, 2, 2);
   }
-  @override
-  void dispose() {
-    _textEditingController.dispose(); // Giải phóng bộ nhớ khi widget bị loại bỏ
-    super.dispose();
-  }
-  
 
+  handle(String text) {
+    if (text == 'AC') {
+      setState(() {
+        userInput = '';
+      });
+    } else if (text == 'DEL') {
+      setState(() {
+        if (userInput.isNotEmpty) {
+          userInput = userInput.substring(0, userInput.length - 1);
+        }
+      });
+    } else if (text == 'enter') {
+      process();
+    } else if (text != 'ESC' && text != 'DEL' && text != 'enter') {
+      setState(() {
+        userInput += text;
+      });
+    }
+  }
+
+  process() {
+    if (userInput == _correctPassword) {
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => AdminApp()));
+    }
+    if (userInput != _correctPassword) {
+      setState(() {
+        errorMessage = 'Kindly enter the correct password';
+      });
+    }
+  }
 }
