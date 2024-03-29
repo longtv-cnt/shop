@@ -12,9 +12,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Calculator',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.deepPurple),
+        // colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.deepPurple)
+        //,
         useMaterial3: true,
       ),
       home: const Calculator(),
@@ -33,6 +33,7 @@ class _CalculatorState extends State<Calculator> {
   String userInput = '';
   String _correctPassword = '12345';
   String errorMessage = '';
+  final FocusNode _passwordFocusNode = FocusNode(); // FocusNode cho TextField
 
   List<String> buttons = [
     '7',
@@ -48,121 +49,149 @@ class _CalculatorState extends State<Calculator> {
     'ESC',
     'enter',
     'GE',
-    'VI'
+    'VI',
+    'DEL',
   ];
+
+  @override
+  void dispose() {
+    _passwordFocusNode.dispose(); // Giải phóng FocusNode khi widget bị dispose
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        backgroundColor: const Color.fromARGB(255, 253, 249, 249),
-        body: Column(
-          children: [
-            SizedBox(
-              child: Column(
-                children: [
-                  const Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      // IconButton(
-                      //   onPressed: () {},
-                      //   icon: Icon(Icons.access_alarms),
-                      // ),
-                      Icon(Icons.key, size: 30),
-                      Text(
-                        'Password',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+        body: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            final passwordFieldHeight =
+                constraints.maxHeight * 0.4; // 20% của chiều cao màn hình
+            final buttonWidth = MediaQuery.of(context).size.width /
+                3.2; // Chiều rộng của mỗi ô được chia đều thành 3 cột
+            final buttonHeight = (constraints.maxHeight - passwordFieldHeight) /
+                6; // Phần còn lại của chiều cao màn hình được chia cho 5
+            return GestureDetector(
+              onTap: () {
+                _passwordFocusNode
+                    .unfocus(); // Mất focus khi chạm vào ngoài TextField
+              },
+              child: Container(
+                margin: const EdgeInsets.all(1),
+                child: Column(
+                  children: [
+                    Column(
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(height: buttonWidth, width: buttonWidth),
+                            Container(
+                              child: const Row(
+                                children: [
+                                  Icon(Icons.key, size: 24),
+                                  SizedBox(width: 8, height: 8),
+                                  Text(
+                                    'Password',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              margin: const EdgeInsets.all(5),
+                              width: constraints.maxWidth * 0.93,
+                              child: TextField(
+                                focusNode: _passwordFocusNode, // Gán FocusNode
+                                decoration: InputDecoration(
+                                  labelText: 'Enter your password',
+                                  errorText: errorMessage.isNotEmpty
+                                      ? errorMessage
+                                      : null,
+                                  enabledBorder: const OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Colors.red, width: 2.0),
+                                  ),
+                                  focusedBorder: const OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Colors.green, width: 2.0),
+                                  ),
+                                ),
+                                controller:
+                                    TextEditingController(text: userInput),
+                                keyboardType: TextInputType.none,
+                                obscureText: true,
+                                onChanged: (value) {
+                                  setState(() {
+                                    userInput = value;
+                                  });
+                                },
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                      SizedBox(width: 100),
-                      // IconButton(
-                      //   onPressed: () {},
-                      //   icon: Icon(Icons.more_vert),
-                      // ),
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 2.0),
-                    child: TextField(
-                      decoration: InputDecoration(
-                        border: const OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: Colors.red, width: 2.0)),
-                        labelText: 'Enter your password',
-                        errorText:
-                            errorMessage.isNotEmpty ? errorMessage : null,
-                      ),
-                      obscureText: true,
-                      readOnly: true,
-                      keyboardType: TextInputType.none,
-                      controller: TextEditingController(text: userInput),
+                        Container(
+                          margin: EdgeInsets.only(
+                              top: MediaQuery.of(context).size.height * 0.07,
+                              left: 10),
+                          width: double.infinity,
+                          child: Wrap(
+                            alignment: WrapAlignment.start,
+                            spacing: 1.0,
+                            runSpacing: 1.0,
+                            children: buttons.map((text) {
+                              return SizedBox(
+                                width: buttonWidth,
+                                height: buttonHeight,
+                                child: CustomButton(text: text),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 1),
-                child: GridView.builder(
-                  shrinkWrap: false,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 2.0, // Adjust this value
-                    mainAxisSpacing: 2.0, // Adjust this value
-                  ),
-                  itemCount: buttons.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return CustomButton(
-                      text: buttons[index],
-                    );
-                  },
+                  ],
                 ),
               ),
-            ),
-          ],
+            );
+          },
         ),
       ),
     );
   }
 
   Widget CustomButton({required String text}) {
-    return Padding(
-      padding: const EdgeInsets.all(0),
-      child: InkWell(
-        splashColor: Colors.lightGreen,
-        onTap: () {
-          setState(() {
-            handle(text);
-          });
-        },
-        child: Ink(
-          // width: 0.1,
-          // height: 0.1,
-          decoration: BoxDecoration(
-            color: const Color.fromARGB(255, 245, 243, 243),
-            borderRadius: BorderRadius.circular(1),
-          ),
-          child: Center(
-            child: text == 'GE'
-                ? Image.asset(
-                    'assets/image/ge_flag.jpg',
-                    width: 24,
-                    height: 24,
-                  )
-                : text == 'VI'
-                    ? Image.asset(
-                        'assets/image/vi_flag.png', //
-                        width: 24,
-                        height: 24,
-                      )
-                    : Text(
-                        text,
-                        style: TextStyle(fontSize: 27, color: getColor(text)),
-                      ),
-          ),
+    return InkWell(
+      onTap: () {
+        setState(() {
+          handle(text);
+        });
+      },
+      child: Ink(
+        decoration: BoxDecoration(
+          color: Color.fromARGB(255, 205, 202, 212),
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        child: Center(
+          child: text == 'GE'
+              ? Image.asset(
+                  'assets/image/ge_flag.jpg',
+                  width: 24,
+                  height: 24,
+                )
+              : text == 'VI'
+                  ? Image.asset(
+                      'assets/image/vi_flag.png',
+                      width: 24,
+                      height: 24,
+                    )
+                  : Text(
+                      text,
+                      style: TextStyle(fontSize: 24, color: getColor(text)),
+                    ),
         ),
       ),
     );
@@ -184,13 +213,19 @@ class _CalculatorState extends State<Calculator> {
       setState(() {
         if (userInput.isNotEmpty) {
           userInput = userInput.substring(0, userInput.length - 1);
+          errorMessage = '';
         }
       });
     } else if (text == 'enter') {
       process();
-    } else if (text != 'ESC' && text != 'DEL' && text != 'enter') {
+    } else if (text != 'ESC' &&
+        text != 'DEL' &&
+        text != 'enter' &&
+        text != 'GE' &&
+        text != 'VI') {
       setState(() {
         userInput += text;
+        errorMessage = '';
       });
     }
   }
@@ -198,9 +233,12 @@ class _CalculatorState extends State<Calculator> {
   process() {
     if (userInput == _correctPassword) {
       Navigator.push(
-          context, MaterialPageRoute(builder: (context) => AdminApp()));
-    }
-    if (userInput != _correctPassword) {
+        context,
+        MaterialPageRoute(
+          builder: (context) => AdminApp(),
+        ),
+      );
+    } else {
       setState(() {
         errorMessage = 'Kindly enter the correct password';
       });
