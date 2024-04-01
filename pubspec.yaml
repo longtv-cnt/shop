@@ -37,7 +37,7 @@ dependencies:
   cupertino_icons: ^1.0.6
   keyboard_actions: ^4.2.0
   built_in_keyboard: ^0.2.0
-
+  curved_labeled_navigation_bar: ^2.0.2
 dev_dependencies:
   flutter_test:
     sdk: flutter
