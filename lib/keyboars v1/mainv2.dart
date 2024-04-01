@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:shop/admin-app.dart';
 
 
@@ -69,7 +69,7 @@ class _CalculatorState extends State<Calculator> {
             image: DecorationImage(
               image: AssetImage('assets/image/background.jpg'),
               fit: BoxFit.cover,
-              opacity: 0.2,
+              opacity: 0.3,
             ),
           ),
           child: LayoutBuilder(
@@ -157,7 +157,25 @@ class _CalculatorState extends State<Calculator> {
                                 return SizedBox(
                                   width: buttonWidth,
                                   height: buttonHeight,
-                                  child: CustomButton(text: text),
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      handle(text);
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      elevation: 10, // Độ nổi của nút
+                                      backgroundColor:
+                                          Colors.grey.shade300, // Màu nền),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(8.0),
+                                        side: BorderSide(
+                                          color: Colors.black,
+                                          width: 0.5,
+                                        ),
+                                      ),
+                                    ),
+                                    child: CustomButton(text: text),
+                                  ),
                                 );
                               }).toList(),
                             ),
@@ -176,41 +194,23 @@ class _CalculatorState extends State<Calculator> {
   }
 
   Widget CustomButton({required String text}) {
-    return InkWell(
-      onTap: () {
-        setState(() {
-          handle(text);
-        });
-      },
-      child: Ink(
-        decoration: BoxDecoration(
-          color: Color.fromARGB(255, 205, 202, 212),
-          borderRadius: BorderRadius.circular(8.0),
-          backgroundBlendMode: BlendMode.colorDodge,
-          border: Border.all(
-            color: Colors.black,
-            width: 0.5,
-          ),
-        ),
-        child: Center(
-          child: text == 'GE'
+    return Center(
+      child: text == 'GE'
+          ? Image.asset(
+              'assets/image/ge_flag.jpg',
+              width: 24,
+              height: 24,
+            )
+          : text == 'VI'
               ? Image.asset(
-                  'assets/image/ge_flag.jpg',
+                  'assets/image/vi_flag.png',
                   width: 24,
                   height: 24,
                 )
-              : text == 'VI'
-                  ? Image.asset(
-                      'assets/image/vi_flag.png',
-                      width: 24,
-                      height: 24,
-                    )
-                  : Text(
-                      text,
-                      style: TextStyle(fontSize: 24, color: getColor(text)),
-                    ),
-        ),
-      ),
+              : Text(
+                  text,
+                  style: TextStyle(fontSize: 24, color: getColor(text)),
+                ),
     );
   }
 
