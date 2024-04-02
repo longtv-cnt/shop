@@ -34,7 +34,19 @@ class AdminApp extends StatelessWidget {
     '13',
     '15',
     '8',
-    '2'
+    '2',
+    '6',
+    '3',
+    '9',
+    '2',
+    '11',
+    '6',
+    '11',
+    '13',
+    '15',
+    '8',
+    '2',
+    '3',
   ];
 
   final List<bool> isButtonPressedList =
@@ -146,8 +158,8 @@ class AdminApp extends StatelessWidget {
                                       gridDelegate:
                                           const SliverGridDelegateWithFixedCrossAxisCount(
                                         crossAxisCount: 3,
-                                        crossAxisSpacing: 3,
-                                        mainAxisSpacing: 3,
+                                        crossAxisSpacing: 8,
+                                        mainAxisSpacing: 8,
                                         childAspectRatio: 1.5,
                                       ),
                                       itemCount: tables.length,
